@@ -4,12 +4,6 @@ from app import app, db
 from app.models import Task
 from app.errors import not_found, incorrect_data
 
-"""
-    Currently not implemented the database.
-    Using a list with dictionary, but should use a database.
-    Next step would be creating a database.
-"""
-
 
 @app.route('/', methods=['GET'])
 def get_task():
