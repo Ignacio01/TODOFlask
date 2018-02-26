@@ -9,20 +9,22 @@ from app.errors import not_found, incorrect_data
 def get_task():
     """
     :return:
-        all the tasks in the list
+        All the tasks in the database
     """
-    tasks_db = Task.query.all()
     output = []
+
+    tasks_db = Task.query.all()
 
     if len(tasks_db) == 0:
         return jsonify({'lists': 'No tasks to be done'})
 
     for task in tasks_db:
-        task_data = {}
-        task_data['id'] = task.id
-        task_data['title'] = task.title
-        task_data['description'] = task.description
-        task_data['done'] = task.done
+        task_data = {
+            'id': task.id,
+            'title': task.title,
+            'description': task.description,
+            'done': task.done
+        }
         output.append(task_data)
 
     return jsonify({'lists': output})
@@ -34,7 +36,7 @@ def get_individual_task(task_id):
     :param task_id:
         The task id is passed with the route.
     :return:
-        Returns json with the task if found, else abort would be executed.
+        Returns a json items if the task found otherwise abort 404 not found
     """
     task = Task.query.get(task_id)
 
@@ -54,23 +56,23 @@ def get_individual_task(task_id):
 @app.route('/', methods=['POST'])
 def create_task():
     """
-    To test the creation using curl
-    curl -i -H "Content-Type: application/json" -X POST -d '{"title":"Read a book", "description": "Reading is fun"}'
-    http://localhost:5000/
+    This method creates a new task. Validates that the title is not empty.
     :return:
+        The list with all the previous tasks plus the new task.
     """
 
-    # Retrieving the current values in the database to show all the tasks stored
+    # Retrieving the current values in the database to show all the tasks
     tasks_db = Task.query.all()
     tasks = []
 
     for task in tasks_db:
-        dict_task = {}
-        dict_task['id'] = task.id
-        dict_task['title'] = task.title
-        dict_task['description'] = task.description
-        dict_task['done'] = task.done
-        tasks.append(dict_task)
+        task_data = {
+            'id': task.id,
+            'title': task.title,
+            'description': task.description,
+            'done': task.done
+        }
+        tasks.append(task_data)
 
     data_received = request.json
 
@@ -87,14 +89,13 @@ def create_task():
     db.session.commit()
 
     # Converting the object task to a dictionary
-    task_dict = {
+    task_data = {
         'id': task_db.id,
         'title': task_db.title,
         'description': task_db.description,
         'done': task_db.done
     }
-
-    tasks.append(task_dict)
+    tasks.append(task_data)
 
     return jsonify({'tasks': tasks}), 201
 
@@ -102,9 +103,10 @@ def create_task():
 @app.route('/<int:task_id>', methods=['PUT'])
 def update_task(task_id):
     """
-    curl -i -H "Content-Type: application/json" -X PUT -d '{"done":true}' http://localhost:5000/2
+    Changes the values of a task, except for the id
     :param task_id:
     :return:
+        Returns the task updated.
     """
 
     data = request.json
@@ -139,8 +141,10 @@ def update_task(task_id):
 @app.route('/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
     """
+    Removes a task from the database
     :param task_id:
     :return:
+        Returns a confirmation message if the task has been deleted correctly.
     """
     task = Task.query.get(task_id)
     if task is None:
