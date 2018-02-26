@@ -144,17 +144,16 @@ def update_task(task_id):
 @app.route('/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
     """
-
     :param task_id:
     :return:
     """
-    task = [task for task in tasks if task['id'] == task_id]
-
-    if len(task) == 0:
+    task = Task.query.get(task_id)
+    if task is None:
         abort(404)
+    db.session.delete(task)
+    db.session.commit()
 
-    tasks.remove(task[0])
-    return jsonify({'tasks': tasks})
+    return jsonify({'tasks': "Task {} deleted correctly".format(task_id)})
 
 
 @app.errorhandler(404)
