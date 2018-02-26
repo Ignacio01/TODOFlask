@@ -1,7 +1,8 @@
-from flask import jsonify, abort, make_response, request
+from flask import jsonify, abort, request
 # app defined in the __init__
 from app import app, db
 from app.models import Task
+from app.errors import not_found, incorrect_data
 
 """
     Currently not implemented the database.
@@ -154,20 +155,3 @@ def delete_task(task_id):
     db.session.commit()
 
     return jsonify({'tasks': "Task {} deleted correctly".format(task_id)})
-
-
-@app.errorhandler(404)
-def not_found(error):
-    """
-    Handle the exception when something is not found (404)
-    :param error:
-    :return:
-        Json with error message.
-
-    """
-    return make_response(jsonify({'error': 'Task not Found'}))
-
-
-@app.errorhandler(400)
-def incorrect_data(error):
-    return make_response(jsonify({'error': 'Incorrect Parameters'}))
