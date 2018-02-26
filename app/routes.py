@@ -8,7 +8,6 @@ from app.models import Task
     Using a list with dictionary, but should use a database.
     Next step would be creating a database.
 """
-tasks = []
 
 
 @app.route('/', methods=['GET'])
@@ -18,30 +17,43 @@ def get_task():
         all the tasks in the list
     """
     tasks_db = Task.query.all()
+    output = []
 
     if len(tasks_db) == 0:
         return jsonify({'lists': 'No tasks to be done'})
 
-    return jsonify({'lists': tasks_db})
-    return jsonify({'tasks': tasks})
+    for task in tasks_db:
+        task_data = {}
+        task_data['id'] = task.id
+        task_data['title'] = task.title
+        task_data['description'] = task.description
+        task_data['done'] = task.done
+        output.append(task_data)
+
+    return jsonify({'lists': output})
 
 
 @app.route('/<int:task_id>', methods=['GET'])
 def get_individual_task(task_id):
     """
-
     :param task_id:
         The task id is passed with the route.
     :return:
         Returns json with the task if found, else abort would be executed.
     """
-    task = [task for task in tasks if task['id'] == task_id]
+    task = Task.query.get(task_id)
 
-    print(task)
-    if len(task) == 0:
+    if task is None:
         abort(404)
 
-    return jsonify({'task': task[0]})
+    output = {
+        'id': task.id,
+        'title': task.title,
+        'description': task.description,
+        'done': task.done
+    }
+
+    return jsonify({'task': output})
 
 
 @app.route('/', methods=['POST'])
