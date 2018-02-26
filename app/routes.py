@@ -64,34 +64,40 @@ def create_task():
     http://localhost:5000/
     :return:
     """
+    tasks_db = Task.query.all()
+    tasks = []
 
-    if not request.json or not 'title' in request.json:
+    for task in tasks_db:
+        dict_task = {}
+        dict_task['id'] = task.id
+        dict_task['title'] = task.title
+        dict_task['description'] = task.description
+        dict_task['done'] = task.done
+        tasks.append(dict_task)
+
+    data_received = request.json
+
+    if not data_received or not 'title' in data_received:
         abort(400)
 
-    if len(tasks) != 0:
-        task = {
-            'id': tasks[-1]['id'] + 1,
-            'title': request.json['title'],
-            'description': request.json.get('description', ''),
-            'done': False
-        }
-    else:
-        task = {
-            'id': 1,
-            'title': request.json['title'],
-            'description': request.json.get('description', ''),
-            'done': False
-        }
-
+    # Created the object task
     task_db = Task()
-    task_db.title = request.json['title']
-    task_db.description = request.json['description']
+    task_db.title = data_received['title']
+    task_db.description = data_received['description']
     task_db.done = False
 
     db.session.add(task_db)
     db.session.commit()
 
-    tasks.append(task)
+    # Converting the object task to a dictionary
+    task_dict = {
+        'id': task_db.id,
+        'title': task_db.title,
+        'description': task_db.description,
+        'done': task_db.done
+    }
+
+    tasks.append(task_dict)
 
     return jsonify({'tasks': tasks}), 201
 
