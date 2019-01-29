@@ -4,4 +4,4 @@
 <p>The database used for this API is PostgreSQL. However, you could use any other database by changing the database URI, in the config file.<p>
 
 <p>To test the API, if you are looking for a software and do not want to use CURL, I recommend to use Postman.</p>
-<p>Postman allows to test all the methods available in your API</p>
+
